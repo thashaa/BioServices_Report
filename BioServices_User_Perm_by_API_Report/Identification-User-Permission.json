@@ -1,0 +1,178 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 5,
+    "passes": 5,
+    "pending": 0,
+    "failures": 0,
+    "start": "2025-11-21T06:50:45.157Z",
+    "end": "2025-11-21T06:50:47.737Z",
+    "duration": 2580,
+    "testsRegistered": 5,
+    "passPercent": 100,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "2af96b97-64b9-45e3-b46b-a4b3f57d9ec9",
+      "title": "",
+      "fullFile": "D:\\Data\\Automation\\BioServices API\\idUserPerm.js",
+      "file": "\\idUserPerm.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "eee711b2-a10e-45c5-9d3d-07d9937f964d",
+          "title": "Checking User Permission for Identification User Role",
+          "fullFile": "D:\\Data\\Automation\\BioServices API\\idUserPerm.js",
+          "file": "\\idUserPerm.js",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Success Login",
+              "fullTitle": "Checking User Permission for Identification User Role Success Login",
+              "timedOut": false,
+              "duration": 215,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "console.log(\"--Success Login--\")\nloginResponse = await request (url)\n    .post(\"/api/auth/login\")\n    .set(\"Accept\", \"*/*\")\n    .set(\"Content-Type\", \"application/json\")\n    .send({\n        nik: process.env.NIK_ID_USER,\n        password: process.env.PASSWORD,\n        pin: process.env.PIN,\n        device: {\n              deviceId: process.env.DEVICEID,\n              deviceName: process.env.DEVICENAME,\n              platform: process.env.PLATFORM,\n              userAgent: process.env.USERAGENT,\n              ipAddress: process.env.IP_ADD,\n              deviceModel: process.env.DEVICEMODEL,\n              osVersion: process.env.OS_VER,\n              screenResolution: process.env.SCREEN_RES,\n              timezone: process.env.TIMEZONE,\n              language: process.env.LANGUAGE,\n              appVersion: process.env.APP_VER\n        }\n    })\nexpect(loginResponse.status).to.equal(200);\nexpect(loginResponse.body.success).to.equal(true);\nexpect(loginResponse.body.data.isSuccess).to.equal(true);\nexpect(loginResponse.body.data).to.have.property('sessionToken');\nexpect(loginResponse.body.success).to.equal(true);\nconsole.log(loginResponse.body.message);\nsessionToken = loginResponse.body.data.sessionToken;\n//console.log(sessionToken);",
+              "err": {},
+              "uuid": "18a22327-a0bd-4195-9817-bf6fd4e640a0",
+              "parentUUID": "eee711b2-a10e-45c5-9d3d-07d9937f964d",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "2FA Login with totp Code",
+              "fullTitle": "Checking User Permission for Identification User Role 2FA Login with totp Code",
+              "timedOut": false,
+              "duration": 56,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "console.log(\"--2FA Login with totp Code--\")\nloginResponse = await request (url)\n    .post(\"/api/Auth/login/verify-2fa\")\n    .set(\"Accept\", \"*/*\")\n    .set(\"Content-Type\", \"application/json\")\n    .send({\n        sessionToken: sessionToken,\n        totpCode: process.env.idUsrtotp\n    })\nexpect(loginResponse.status).to.equal(200);\nexpect(loginResponse.body.data.isSuccess).to.equal(true);\nexpect(loginResponse.body.data).to.have.property('accessToken');\nexpect(loginResponse.body.success).to.equal(true);\nconsole.log(loginResponse.body.message);\naccessToken = loginResponse.body.data.accessToken;",
+              "err": {},
+              "uuid": "1b161575-8af8-4838-a867-5611e48726be",
+              "parentUUID": "eee711b2-a10e-45c5-9d3d-07d9937f964d",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Perform 1:N Identification with Results",
+              "fullTitle": "Checking User Permission for Identification User Role Perform 1:N Identification with Results",
+              "timedOut": false,
+              "duration": 1087,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "console.log(\"--Perform 1:N Identification with Results--\")\nidentifyResponse = await request (url)\n    .post(\"/api/FaceRecognition/identify\")\n    .set(\"Accept\", \"*/*\")\n    .set(\"Content-Type\", \"application/json\")\n    .set(\"Authorization\", `Bearer ${accessToken}`)\n    .send({\n        photoData: idImage,\n        faceThreshold: \"1.0\",\n        maxResults: \"10\",\n        genderFilter:null\n    })\nexpect(identifyResponse.status).to.equal(200);\nexpect(identifyResponse.body.success).to.equal(true);\nexpect(identifyResponse.body.identifiedCitizens).to.be.an(\"array\").that.is.not.empty;\nexpect(identifyResponse.body.identifiedCitizens[0]).to.include.all.keys(\n    \"nik\",\n    \"name\",\n    \"dateOfBirth\",\n    \"placeOfBirth\",\n    \"gender\",\n    \"address\",\n    \"religion\",\n    \"bloodType\",\n    \"maritalStatus\",\n    \"occupation\",\n    \"nationality\",\n    \"motherName\",\n    \"fatherName\",\n    \"provinceName\",\n    \"regencyName\",\n    \"districtName\",\n    \"villageName\",\n    \"familyCardNumber\",\n    \"age\",\n    \"faceImage\",\n    \"signatureImage\"\n);",
+              "err": {},
+              "uuid": "4b86686b-c7f7-49ea-b367-24c1daec6001",
+              "parentUUID": "eee711b2-a10e-45c5-9d3d-07d9937f964d",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Perform 1:N Identification without Results",
+              "fullTitle": "Checking User Permission for Identification User Role Perform 1:N Identification without Results",
+              "timedOut": false,
+              "duration": 1125,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "console.log(\"--Perform 1:N without Results--\")\nidentifyResponse = await request (url)\n    .post(\"/api/FaceRecognition/identify\")\n    .set(\"Accept\", \"*/*\")\n    .set(\"Content-Type\", \"application/json\")\n     .set(\"Authorization\", `Bearer ${accessToken}`)\n    .send({\n        photoData: idImage,\n        faceThreshold: \"1.0\",\n        maxResults: \"10\",\n        genderFilter:null\n    })\nexpect(identifyResponse.status).to.equal(200);\nexpect(identifyResponse.body.success).to.equal(true);\n//expect(identifyResponse.body.identifiedCitizens).to.be.an(\"array\").that.is.null;",
+              "err": {},
+              "uuid": "c75a9d91-8999-4c91-8dda-222c178c4c62",
+              "parentUUID": "eee711b2-a10e-45c5-9d3d-07d9937f964d",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Perform 1:1 Verification",
+              "fullTitle": "Checking User Permission for Identification User Role Perform 1:1 Verification",
+              "timedOut": false,
+              "duration": 81,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "console.log(\"--Perform 1:1 Verification--\")\nverifResponse = await request (url)\n    .post(\"/api/FaceRecognition/verify\")\n    .set(\"Accept\", \"*/*\")\n    .set(\"Content-Type\", \"application/json\")\n     .set(\"Authorization\", `Bearer ${accessToken}`)\n    .send({\n        nik: process.env.NIK_VERIF,\n        base64Photo: verifImage,\n        faceThreshold: \"1.0\",\n    })\nexpect(verifResponse.status).to.equal(403);",
+              "err": {},
+              "uuid": "1c59e5fd-20d8-4cd2-a3a2-0d1a5a4a554f",
+              "parentUUID": "eee711b2-a10e-45c5-9d3d-07d9937f964d",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "18a22327-a0bd-4195-9817-bf6fd4e640a0",
+            "1b161575-8af8-4838-a867-5611e48726be",
+            "4b86686b-c7f7-49ea-b367-24c1daec6001",
+            "c75a9d91-8999-4c91-8dda-222c178c4c62",
+            "1c59e5fd-20d8-4cd2-a3a2-0d1a5a4a554f"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 2564,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 60000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "11.7.5"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "Identification-User-Permission",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.4"
+    },
+    "marge": {
+      "options": {
+        "reportFilename": "Identification-User-Permission"
+      },
+      "version": "6.3.2"
+    }
+  }
+}
